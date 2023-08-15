@@ -1,0 +1,41 @@
+version: '3'
+services:
+  nodejs-app:
+    build:
+      context: ./sample-node-mongo-api
+    container_name: nodejs-app
+    hostname: nodejs-app
+    ports:
+      - "5555:5555"
+    networks:
+      - zero-net
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URL=mongodb://mongo:27017/dummydb
+
+  mongo:
+    container_name: mongo
+    image: mongo
+    volumes:
+      - ./data:/data/db
+    ports:
+      - "27017:27017"
+    networks:
+      - zero-net
+
+  nginx:
+    build:
+      context: ./nginx
+    container_name: nginx
+    hostname: nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - nodejs-app
+    networks:
+      - zero-net
+
+networks:
+  zero-net:
+    external: true
